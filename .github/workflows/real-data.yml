@@ -46,6 +46,8 @@ jobs:
           cat data/results.json
           echo "::endgroup::"
           .venv/bin/python -m shelfsense.cli monitor || true
+          echo "Months and metrics flagged by drift monitoring:"
+          .venv/bin/python -m shelfsense.cli sql "SELECT month, metric, psi, status, rows FROM drift_monthly WHERE status <> 'stable' ORDER BY month, metric"
       - name: Charts
         run: .venv/bin/python -m shelfsense.cli charts --out real-data/img
       - uses: actions/upload-artifact@v4
