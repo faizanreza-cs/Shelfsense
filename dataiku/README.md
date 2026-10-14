@@ -5,19 +5,12 @@ Run shelfsense as a Dataiku flow on a Snowflake connection. The logic lives in t
 
 ## Flow
 
-```mermaid
-flowchart LR
-    subgraph Snowflake datasets
-        P[products]
-        O[orders]
-        RV[reviews]
-        L[review_labels<br/>optional, from an LLM]
-    end
-    P & O & RV --> T[train_recommender.py] --> REC[recommendations] & EV[recommender_eval]
-    RV & L --> S[score_reviews.py] --> RA[review_aspects] & PA[product_aspects] & AM[aspect_monthly]
-    P & O & RV & RA & AM --> M[monitor.py] --> DM[drift_monthly] & AL[aspect_alerts]
-    RA & RV & P --> Q[SQL recipes<br/>shelfsense/sql/*.sql] --> SC[aspect_scorecard_by_brand, ...]
-```
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../docs/img/dataiku_flow-dark.png">
+  <img src="../docs/img/dataiku_flow.png" alt="The Dataiku flow" width="1268">
+</picture>
+</p>
 
 ## Setup
 

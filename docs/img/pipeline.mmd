@@ -1,0 +1,8 @@
+flowchart TB
+    SIM[Simulator<br/>with ground truth] --> T[(products, orders, reviews)]
+    AMZ[Amazon Reviews 2023<br/>manual workflow] --> T
+    T --> REC[Recommender<br/>candidates + re-ranker + rules]
+    T --> LAB[Labeller<br/>LLM or keywords] --> STU[Student model] --> ASP[Aspect scores]
+    ASP --> MON[Monitoring<br/>PSI + alerts]
+    REC & ASP & MON --> WH[(Warehouse<br/>DuckDB or Snowflake)]
+    WH --> AG[Insights Copilot] --> API[FastAPI]

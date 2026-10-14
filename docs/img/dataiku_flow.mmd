@@ -1,0 +1,11 @@
+flowchart LR
+    subgraph Snowflake datasets
+        P[products]
+        O[orders]
+        RV[reviews]
+        L[review_labels<br/>optional, from an LLM]
+    end
+    P & O & RV --> T[train_recommender.py] --> REC[recommendations] & EV[recommender_eval]
+    RV & L --> S[score_reviews.py] --> RA[review_aspects] & PA[product_aspects] & AM[aspect_monthly]
+    P & O & RV & RA & AM --> M[monitor.py] --> DM[drift_monthly] & AL[aspect_alerts]
+    RA & RV & P --> Q[SQL recipes<br/>shelfsense/sql/*.sql] --> SC[aspect_scorecard_by_brand, ...]

@@ -126,16 +126,12 @@ drift, so it can run as a scheduled job.
 | API (`shelfsense/api.py`) | `/recommend`, `/similar`, `/insights`, `/brands`, `/monitoring`, `/metrics`, `/ask`; optional API key | FastAPI |
 | Real data (`shelfsense/amazon.py`) | Amazon Reviews 2023 supplements into the same tables | httpx, pandas |
 
-```mermaid
-flowchart LR
-    SIM[Simulator<br/>with ground truth] --> T[(products, orders, reviews)]
-    AMZ[Amazon Reviews 2023<br/>manual workflow] --> T
-    T --> REC[Recommender<br/>candidates + re-ranker + rules]
-    T --> LAB[Labeller<br/>LLM or keywords] --> STU[Student model] --> ASP[Aspect scores]
-    ASP --> MON[Monitoring<br/>PSI + alerts]
-    REC & ASP & MON --> WH[(Warehouse<br/>DuckDB or Snowflake)]
-    WH --> AG[Insights Copilot] --> API[FastAPI]
-```
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/pipeline-dark.png">
+  <img src="docs/img/pipeline.png" alt="How shelfsense fits together" width="493">
+</picture>
+</p>
 
 ## Quickstart
 
