@@ -23,6 +23,7 @@ real Amazon reviews.
 | What do reviewers say? | Keyword rules label 2,000 reviews; a TF-IDF + logistic regression model learns from them and scores all 42,285 | Macro-F1 **0.896** against the true labels; product scores track true quality (Spearman 0.94-0.96) |
 | Are better labels worth it? | The same model trained on perfect labels | Macro-F1 **0.985** from just 500 labels: label quality is the limit, which is the case for LLM labels |
 | Did anything go wrong? | Each product-aspect's negative share each month, against its own history | Flagged the reformulated protein in **2026-05, the month it changed** (85% negative vs 15% before), and nothing else |
+| Does it hold on real data? | The same pipeline on 91,227 Amazon reviews of 1,975 supplements | Hybrid recall@10 **0.084**, **+28%** over the best single model (content, 0.066); [details](#results-on-real-reviews) |
 
 ### 1. Recommendations
 
@@ -165,6 +166,42 @@ It's a large download, so it runs as a manual GitHub Actions workflow (**Actions
 Run workflow**): the metrics are printed in the log and the results and charts are saved as an
 artifact. It can also run on any machine with `shelfsense fetch`. The offline tests run the same
 code on the synthetic store written in the dataset's file format.
+
+### Results on real reviews
+
+[Run 38588922400](https://github.com/faizanreza-cs/shelfsense/actions/runs/38588922400) streamed
+every Health & Household review (over 24 million) and found 2,067,424 supplement reviews of 86,407
+products since 2021. The selection kept **91,227 reviews by 24,214 shoppers of 1,975 products**,
+from January 2021 to September 2023. Aspect labels come from the keyword rules, because the
+workflow has no API key.
+
+![Recommenders on real reviews](docs/img/real_recommenders.png)
+
+| Model | Recall@10 | NDCG@10 | Catalogue coverage |
+|---|---|---|---|
+| Popularity | 0.025 | 0.013 | 0.7% |
+| Item-item | 0.059 | 0.038 | 99.8% |
+| SVD | 0.036 | 0.022 | 11.1% |
+| Content | 0.066 | 0.040 | 94.3% |
+| **Hybrid** (learned re-ranker) | **0.084** | **0.052** | 72.8% |
+| Hybrid + at most 3 per brand | 0.084 | 0.052 | 69.7% |
+
+- **Recommendations:** fitted on reviews up to 2022-12-31 and tested on the products 4,590
+  shoppers reviewed for the first time from January to March 2023. Reviews thin out after March
+  (3,214 that month, 1,133 in April, 105 in August), so the test stops at the last full month.
+  The hybrid beats the best single model by **28%**, against 1% on the synthetic store. Content
+  similarity is the strongest single model here, and its rank is the re-ranker's strongest input.
+- **Reviews:** there are no true labels, so the check is the star rating. Reviews with a negative
+  aspect average **3.64 stars**, positive-only reviews **4.58**. Effectiveness (21.6% of reviews)
+  and taste (21.5%) come up most, then value (8.1%); digestion (2.3%) and packaging (0.5%)
+  rarely. The keyword rules were written for the synthetic store's phrasing, so they likely miss
+  real mentions; an LLM-labelled sample would measure how many (`shelfsense label --labeller llm`).
+- **Monitoring:** from July 2021 to April 2023 every metric stayed stable (PSI under 0.1 against
+  the first six months). All 10 flags fall in May to August 2023, as the reviews fall from 418 to
+  105 a month and the mix of categories shifts (PSI 0.86 in August). On a live feed, falling
+  volume with a shifting mix usually means a broken data feed, which is what this monitor is
+  there to catch. No product alerts: one needs 10 mentions of an aspect for one product in a
+  month, and this sample averages 1.4 reviews per product per month.
 
 ## Snowflake
 

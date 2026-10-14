@@ -64,10 +64,13 @@ def recommender_chart(res: dict, path: Path) -> Path:
     rows = pd.DataFrame(res["recommender"]["models"]).set_index("model")
     order = [m for m in MODEL_NAMES if m in rows.index]
     rows = rows.loc[order[::-1]]
+    r = res["recommender"]
+    # on real data a review stands in for a purchase
+    verb = "bought" if res["data"].get("source", "synthetic") == "synthetic" else "reviewed"
     fig, (left, right) = _axes(
         "The learned hybrid has the best recall, from a narrower slice of the catalogue",
-        f"Offline test on {res['recommender']['test_shoppers']:,} shoppers: new products bought "
-        f"in the {res['recommender']['horizon_days']} days after {res['recommender']['cutoff']}",
+        f"Offline test on {r['test_shoppers']:,} shoppers: new products {verb} in the "
+        f"{r['horizon_days']} days after {r['cutoff']}",
         size=(8.6, 4.0), ncols=2,
     )  # fmt: skip
     y = np.arange(len(rows))
