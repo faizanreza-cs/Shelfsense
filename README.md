@@ -1,10 +1,4 @@
-# shelfsense
-
-**Consumer insights for a health and nutrition store: a product recommender with a learned
-re-ranker and business rules, review aspect sentiment trained on LLM labels, and monitoring that
-catches a product going wrong.** Every model is scored against a simulator that knows the true
-answer. The SQL is written once in Snowflake's dialect. An LLM insights agent sits on top, served
-over FastAPI with a Copilot Studio connector, and the repo ships Power BI and Dataiku kits.
+# shelfsense Overview
 
 [![CI](https://github.com/faizanreza-cs/shelfsense/actions/workflows/ci.yml/badge.svg)](https://github.com/faizanreza-cs/shelfsense/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
