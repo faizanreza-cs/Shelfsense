@@ -104,16 +104,16 @@ drift, so it can run as a scheduled job.
 | Part | What it does | Tech |
 |---|---|---|
 | Simulator (`shelfsense/synth.py`) | Catalogue with hidden quality per aspect, shoppers with category tastes, brand loyalty and price sensitivity, reviews with true labels, one reformulation | Python, NumPy |
-| Recommender (`shelfsense/recsys.py`) | Four candidate models, a learned re-ranker, business rules, time-split evaluation | **scikit-learn**, SciPy |
-| Review NLP (`shelfsense/nlp.py`) | Keyword labeller, LLM labeller with structured output, TF-IDF + logistic regression student, product and monthly scores | **scikit-learn**, LLM APIs |
+| Recommender (`shelfsense/recsys.py`) | Four candidate models, a learned re-ranker, business rules, time-split evaluation | scikit-learn, SciPy |
+| Review NLP (`shelfsense/nlp.py`) | Keyword labeller, LLM labeller with structured output, TF-IDF + logistic regression student, product and monthly scores | scikit-learn, LLM APIs |
 | Monitoring (`shelfsense/monitor.py`) | PSI drift and product-aspect alerts | pandas, NumPy |
-| Saved queries (`shelfsense/sql/`) | Aspect scorecard by brand, monthly trend, bought together with lift, repeat purchase rate, monthly sales; rows with fewer than 50 shoppers are dropped | **Snowflake SQL**, run locally on DuckDB via sqlglot |
-| Insights Copilot (`shelfsense/agent/`) | **LLM agent** that answers with the recommender, review insights, monitoring, saved queries and guarded SQL, and cites review ids | Anthropic, OpenAI, **Azure OpenAI**, or offline mock |
-| API (`shelfsense/api.py`) | `/recommend`, `/similar`, `/insights`, `/brands`, `/monitoring`, `/metrics`, `/ask`; optional API key | **FastAPI** |
+| Saved queries (`shelfsense/sql/`) | Aspect scorecard by brand, monthly trend, bought together with lift, repeat purchase rate, monthly sales; rows with fewer than 50 shoppers are dropped | Snowflake SQL, run locally on DuckDB via sqlglot |
+| Insights Copilot (`shelfsense/agent/`) | LLM agent that answers with the recommender, review insights, monitoring, saved queries and guarded SQL, and cites review ids | Anthropic, OpenAI, Azure OpenAI, or offline mock |
+| API (`shelfsense/api.py`) | `/recommend`, `/similar`, `/insights`, `/brands`, `/monitoring`, `/metrics`, `/ask`; optional API key | FastAPI |
 | Real data (`shelfsense/amazon.py`) | Amazon Reviews 2023 supplements into the same tables | httpx, pandas |
-| Power BI kit (`powerbi/`) | Star-schema export, DAX measures, theme, page guide | **Power BI** |
-| Dataiku kit (`dataiku/`) | Flow layout and Python recipes on a Snowflake connection | **Dataiku** |
-| Copilot Studio (`copilot/`, `docs/copilot-studio.md`) | OpenAPI connector so a Copilot Studio agent can call the Insights Copilot | **Microsoft Copilot Studio** |
+| Power BI kit (`powerbi/`) | Star-schema export, DAX measures, theme, page guide | Power BI |
+| Dataiku kit (`dataiku/`) | Flow layout and Python recipes on a Snowflake connection | Dataiku |
+| Copilot Studio (`copilot/`, `docs/copilot-studio.md`) | OpenAPI connector so a Copilot Studio agent can call the Insights Copilot | Microsoft Copilot Studio |
 
 ```mermaid
 flowchart LR
@@ -266,8 +266,7 @@ powerbi/  dataiku/  copilot/  snowflake/  docs/
 ## Need this for your brand?
 
 I build consumer insights and e-commerce analytics for health and CPG brands: recommendation
-engines, review and survey NLP with LLMs, model monitoring, and AI assistants on top of
-Snowflake, Power BI and Dataiku.
+engines, review and survey NLP with LLMs, model monitoring, and AI assistants.
 
 **Faizan Reza**, AI engineer · [GitHub](https://github.com/faizanreza-cs) · faizanreza01@gmail.com
 

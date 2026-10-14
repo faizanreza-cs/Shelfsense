@@ -1,7 +1,7 @@
 [project]
 name = "shelfsense"
 version = "0.1.0"
-description = "Consumer insights and product recommendations for a health and nutrition store: a recommender with a learned re-ranker, review aspect sentiment trained on LLM labels, drift monitoring and an insights agent. Snowflake-ready SQL, Power BI and Dataiku kits."
+description = "Consumer insights and product recommendations for a health and nutrition store: a recommender with a learned re-ranker, review aspect sentiment trained on LLM labels, drift monitoring and an insights agent."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
