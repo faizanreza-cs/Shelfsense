@@ -1,9 +1,22 @@
-# ShelfSense Overview
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/logo-dark.svg">
+  <img src="docs/img/logo.svg" alt="ShelfSense" height="100">
+</picture>
+
+<p><em>Recommendations, review insights and monitoring for a consumer health store, checked against a simulator that knows the truth, then run on real Amazon reviews.</em></p>
 
 [![CI](https://github.com/faizanreza-cs/shelfsense/actions/workflows/ci.yml/badge.svg)](https://github.com/faizanreza-cs/shelfsense/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
-![SQL](https://img.shields.io/badge/SQL-Snowflake-29b5e8)
 ![License](https://img.shields.io/badge/license-MIT-green)
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2)](https://www.linkedin.com/in/YOUR-LINKEDIN-ID)
+[![X](https://img.shields.io/badge/X-Follow-000000?logo=x&logoColor=white)](https://x.com/YOUR_X_HANDLE)
+
+</div>
+
+## ⚡ Overview
 
 A consumer health brand's insights team asks three questions every month: what should each
 shopper buy next, what are reviewers saying about taste, digestion, effectiveness, value and
@@ -112,9 +125,6 @@ drift, so it can run as a scheduled job.
 | Insights Copilot (`shelfsense/agent/`) | LLM agent that answers with the recommender, review insights, monitoring, saved queries and guarded SQL, and cites review ids | Anthropic, OpenAI, Azure OpenAI, or offline mock |
 | API (`shelfsense/api.py`) | `/recommend`, `/similar`, `/insights`, `/brands`, `/monitoring`, `/metrics`, `/ask`; optional API key | FastAPI |
 | Real data (`shelfsense/amazon.py`) | Amazon Reviews 2023 supplements into the same tables | httpx, pandas |
-| Power BI kit (`powerbi/`) | Star-schema export, DAX measures, theme, page guide | Power BI |
-| Dataiku kit (`dataiku/`) | Flow layout and Python recipes on a Snowflake connection | Dataiku |
-| Copilot Studio (`copilot/`, `docs/copilot-studio.md`) | OpenAPI connector so a Copilot Studio agent can call the Insights Copilot | Microsoft Copilot Studio |
 
 ```mermaid
 flowchart LR
@@ -124,9 +134,7 @@ flowchart LR
     T --> LAB[Labeller<br/>LLM or keywords] --> STU[Student model] --> ASP[Aspect scores]
     ASP --> MON[Monitoring<br/>PSI + alerts]
     REC & ASP & MON --> WH[(Warehouse<br/>DuckDB or Snowflake)]
-    WH --> AG[Insights Copilot] --> API[FastAPI] --> CS[Copilot Studio / Teams]
-    WH --> PBI[Power BI kit]
-    T --> DKU[Dataiku flow]
+    WH --> AG[Insights Copilot] --> API[FastAPI]
 ```
 
 ## Quickstart
@@ -203,35 +211,12 @@ workflow has no API key.
   there to catch. No product alerts: one needs 10 mentions of an aspect for one product in a
   month, and this sample averages 1.4 reviews per product per month.
 
-## Snowflake
+## Integrations
 
-All SQL is written in Snowflake's dialect. CI runs every query on DuckDB through sqlglot's
-translation; on Snowflake the same files run unchanged.
-
-1. Run [`snowflake/setup.sql`](snowflake/setup.sql). It creates a warehouse, a database, a loader
-   role and a **read-only analyst role** for the agent, API and Dataiku.
-2. `pip install "shelfsense[snowflake]"`, set `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USER`,
-   `SNOWFLAKE_PASSWORD` (or `SNOWFLAKE_PRIVATE_KEY_FILE`), `SNOWFLAKE_ROLE=SHELFSENSE_LOADER` and
-   `SNOWFLAKE_WAREHOUSE=SHELFSENSE_WH`, then run `shelfsense load`.
-3. Switch to the analyst role and `SHELFSENSE_BACKEND=snowflake`. Saved queries, `shelfsense
-   sql` and the agent then run against Snowflake.
-4. Optional (Enterprise Edition): the aggregation policy at the end of `setup.sql` makes
-   Snowflake itself refuse to list a shopper's purchases to the analyst role.
-
-## Power BI, Dataiku and Copilot Studio
-
-- **Power BI:** `shelfsense export-powerbi` writes the star schema to `powerbi/data/`, with no
-  shopper-level rows. [`powerbi/README.md`](powerbi/README.md) lists the relationships and the
-  pages (consumer insights, product drill-through, model monitoring, recommender, sales), the
-  DAX measures ([`measures.dax`](powerbi/measures.dax)) and the theme
-  ([`theme.json`](powerbi/theme.json)).
-- **Dataiku:** [`dataiku/README.md`](dataiku/README.md) gives the flow (recommender, review
-  scoring, monitoring, SQL recipes) on a Snowflake connection, with a monthly scenario that
-  alerts the category team. The recipes are thin wrappers around the tested library.
-- **Copilot Studio:** [`docs/copilot-studio.md`](docs/copilot-studio.md) adds the Insights
-  Copilot, product insights and recommendations to a Copilot Studio agent through a custom
-  connector ([`copilot/insights-copilot.swagger.json`](copilot/insights-copilot.swagger.json)),
-  so the team can ask in Teams.
+The same SQL runs on Snowflake ([`snowflake/setup.sql`](snowflake/setup.sql) creates a read-only
+role for the agent and API), and the repo carries starter kits for
+[Power BI](powerbi/README.md), [Dataiku](dataiku/README.md) and
+[Copilot Studio](docs/copilot-studio.md). The kits aren't run in CI.
 
 ## Guardrails
 
@@ -254,23 +239,14 @@ translation; on Snowflake the same files run unchanged.
 
 ## Tests and evals
 
-- **92 tests**, all offline:
-  - The simulator's determinism and true labels.
-  - Recommender maths by hand (similarity, NDCG, rules, new-item targets, the same tie order on
-    every CPU) and the hybrid against the baselines.
-  - The keyword labeller on tricky sentences, the student model, F1, and the LLM labeller and
-    structured outputs with fake Anthropic and OpenAI clients.
-  - PSI by hand, alerts on a spike and not on noise, and the reformulation found in the right
-    month.
-  - Every saved query on DuckDB, the schema against the warehouse, the SQL guard (13 ways to leak
-    shopper ids, 5 legitimate uses), masked errors and the query timeout.
-  - The agent's tools and providers, the API with its key check, and the real-data path on files
-    in the dataset's format.
-  - The Power BI measures against the exported columns, the connector against the API, the
-    Dataiku recipes against the library, and the charts.
-- **Agent eval** (`make eval`): 21 golden questions, with the expected tool and the facts each
-  answer must contain, read from the results at eval time. The offline mock passes 21/21, which
-  checks the tools and routing. Run `make eval-llm` to score a real model on the same questions.
+**92 offline tests** cover the simulator's labels, the recommender maths by hand (including the
+same tie order on every CPU), the review labellers and student model, drift and alert logic (the
+reformulation found in the right month), every saved query, the SQL guard (13 leak attempts
+blocked), the providers with fake clients, the API and the real-data path.
+
+**Agent eval** (`make eval`): 21 golden questions with the expected tool and the facts each answer
+must contain, read from the data at eval time. The offline mock passes 21/21, which checks the
+tools and routing; `make eval-llm` scores a real model on the same questions.
 
 ## Limitations
 
@@ -281,31 +257,6 @@ translation; on Snowflake the same files run unchanged.
 - **LLM labelling wasn't run here** (no API key in this environment). `shelfsense label` measures
   it in one command.
 - **Reviews stand in for purchases** in the real-data run; real order data would be better.
-- **Paths not run in CI:** the Snowflake loader, the Dataiku recipes and the Power BI report.
-  They use the same tested code and SQL.
-
-```
-shelfsense/
-  synth.py          simulator with ground truth
-  recsys.py         candidate models, re-ranker, business rules, evaluation
-  nlp.py            keyword and LLM labellers, student model, product scores
-  monitor.py        PSI drift, product-aspect alerts
-  sql/*.sql         saved queries (Snowflake SQL)
-  warehouse.py      DuckDB / Snowflake backends
-  pipeline.py       build -> warehouse + results.json
-  amazon.py         Amazon Reviews 2023 -> the same tables
-  agent/            Insights Copilot: providers, tools, SQL guard, loop
-  evals/            golden questions + runner
-  api.py · cli.py · charts.py · powerbi.py
-powerbi/  dataiku/  copilot/  snowflake/  docs/
-```
-
-## Need this for your brand?
-
-I build consumer insights and e-commerce analytics for health and CPG brands: recommendation
-engines, review and survey NLP with LLMs, model monitoring, and AI assistants.
-
-**Faizan Reza**, AI engineer · [GitHub](https://github.com/faizanreza-cs) · faizanreza01@gmail.com
 
 ## License
 
