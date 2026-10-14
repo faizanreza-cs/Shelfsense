@@ -67,9 +67,13 @@ def _http_lines(url: str) -> Iterator[bytes]:
     timeout = httpx.Timeout(60.0, read=600.0)
     with httpx.stream("GET", url, follow_redirects=True, timeout=timeout) as r:
         r.raise_for_status()
-        inflate = zlib.decompressobj(31) if url.endswith(".gz") else None
+        inflate: Any = None
         rest = b""
-        for chunk in r.iter_raw(1 << 20):
+        # iter_bytes undoes any transfer encoding; a gzip file is then spotted by its header,
+        # whatever the URL says (mirrors differ)
+        for n, chunk in enumerate(r.iter_bytes(1 << 20)):
+            if n == 0 and chunk[:2] == b"\x1f\x8b":
+                inflate = zlib.decompressobj(31)
             lines = (rest + (inflate.decompress(chunk) if inflate else chunk)).split(b"\n")
             rest = lines.pop()
             yield from lines
@@ -159,14 +163,16 @@ def _clean(text: Any, limit: int) -> str:
     return " ".join(_TAGS.sub(" ", str(text or "")).split())[:limit]
 
 
-def _scan_reviews(category: str, items: dict[str, Any], since_ms: int, tmp: Path) -> pd.DataFrame:
-    """Pass 1: keep supplement reviews since ``since`` in a local file; return their keys."""
-    users, asins, stamps = [], [], []
-    kept = 0
+def _scan_reviews(category: str, items: dict[str, Any], since_ms: int, tmp: Path) -> Counter[str]:
+    """Pass 1: keep supplement reviews since ``since`` in a local file; count them per product.
+
+    Only the counts stay in memory: the file can hold millions of reviews.
+    """
+    counts: Counter[str] = Counter()
     with gzip.open(tmp, "wt", compresslevel=1) as out:
         for n, line in enumerate(_lines("reviews", category), 1):
             if n % 2_000_000 == 0:
-                _log(f"reviews: {n:,} read, {kept:,} kept")
+                _log(f"reviews: {n:,} read, {sum(counts.values()):,} kept")
             m = _PARENT.search(line)
             if not m or m.group(1).decode() not in items:
                 continue
@@ -180,20 +186,31 @@ def _scan_reviews(category: str, items: dict[str, Any], since_ms: int, tmp: Path
                 "x": _clean(r.get("text"), 1000), "v": bool(r.get("verified_purchase")),
             }  # fmt: skip
             out.write(json.dumps(row) + "\n")
-            users.append(row["u"])
-            asins.append(row["i"])
-            stamps.append(ts)
-            kept += 1
-    _log(f"reviews: {kept:,} supplement reviews since the start date")
-    return pd.DataFrame({"user": users, "item": asins, "ts": stamps})
+            counts[row["i"]] += 1
+    _log(f"reviews: {sum(counts.values()):,} supplement reviews of {len(counts):,} products "
+         "since the start date")  # fmt: skip
+    return counts
 
 
-def _select(keys: pd.DataFrame, max_items: int, min_reviews: int, max_reviews: int,
-            seed: int) -> pd.DataFrame:  # fmt: skip
-    """Top products, then repeat reviewers, then a random sample of shoppers under the cap."""
-    keys = keys.drop_duplicates(["user", "item"], keep="last")
-    top = keys["item"].value_counts().head(max_items).index
-    k = keys[keys["item"].isin(top)]
+def _keys(tmp: Path, keep: set[str]) -> pd.DataFrame:
+    """Pass 2: shopper, product and time of every review of the kept products."""
+    shoppers: dict[str, int] = {}  # shopper ids as small ints while scanning
+    users, asins, stamps = [], [], []
+    with gzip.open(tmp, "rt") as fh:
+        for line in fh:
+            r = json.loads(line)
+            if r["i"] in keep:
+                users.append(shoppers.setdefault(r["u"], len(shoppers)))
+                asins.append(r["i"])
+                stamps.append(r["t"])
+    names = np.array(list(shoppers), dtype=object)
+    return pd.DataFrame({"user": names[np.array(users, dtype=np.int64)], "item": asins,
+                         "ts": stamps})  # fmt: skip
+
+
+def _select(keys: pd.DataFrame, min_reviews: int, max_reviews: int, seed: int) -> pd.DataFrame:
+    """Repeat reviewers of the kept products, then a random sample of shoppers under the cap."""
+    k = keys.drop_duplicates(["user", "item"], keep="last")
     for _ in range(3):  # shoppers need history; products need enough shoppers
         k = k[k.groupby("user")["item"].transform("size") >= min_reviews]
         k = k[k.groupby("item")["user"].transform("size") >= 5]
@@ -211,7 +228,7 @@ def _select(keys: pd.DataFrame, max_items: int, min_reviews: int, max_reviews: i
 def tables_from(
     items: dict[str, dict[str, Any]], tmp: Path, keys: pd.DataFrame
 ) -> dict[str, pd.DataFrame]:
-    """Pass 2: the selected reviews with text, as products / orders / reviews tables."""
+    """Pass 3: the selected reviews with text, as products / orders / reviews tables."""
     want = set(zip(keys["user"], keys["item"], keys["ts"], strict=True))
     rows = []
     with gzip.open(tmp, "rt") as fh:
@@ -261,9 +278,12 @@ def fetch_and_build(
     since_ms = int(pd.Timestamp(since).timestamp() * 1000)
     with tempfile.TemporaryDirectory() as d:
         tmp = Path(d) / "reviews.jsonl.gz"
-        keys = _scan_reviews(category, items, since_ms, tmp)
-        keys = _select(keys, max_items, min_reviews, max_reviews, seed)
+        counts = _scan_reviews(category, items, since_ms, tmp)
+        top = {item for item, _ in counts.most_common(max_items)}
+        keys = _select(_keys(tmp, top), min_reviews, max_reviews, seed)
         tables = tables_from(items, tmp, keys)
+    months = tables["orders"]["order_ts"].dt.strftime("%Y-%m").value_counts().sort_index()
+    _log("reviews per month, last 8: " + ", ".join(f"{m} {n:,}" for m, n in months[-8:].items()))
     _log(f"tables ready after {time.time() - t0:.0f} s; running the pipeline")
     source = f"amazon-reviews-2023/{category} (supplements)"
     results, derived, model = pipeline.analyse(tables, None, labeller=labeller, source=source)

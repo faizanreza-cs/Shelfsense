@@ -217,7 +217,7 @@ translation; on Snowflake the same files run unchanged.
 
 ## Tests and evals
 
-- **87 tests**, all offline:
+- **91 tests**, all offline:
   - The simulator's determinism and true labels.
   - Recommender maths by hand (similarity, NDCG, rules, new-item targets) and the hybrid against
     the baselines.

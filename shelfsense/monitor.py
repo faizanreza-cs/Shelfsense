@@ -41,9 +41,12 @@ def _month(ts: pd.Series) -> pd.Series:
 
 def drift_table(
     orders: pd.DataFrame, products: pd.DataFrame, reviews: pd.DataFrame,
-    labels: pd.DataFrame, reference_months: int = 6,
+    labels: pd.DataFrame, reference_months: int = 6, min_rows: int = 100,
 ) -> pd.DataFrame:  # fmt: skip
-    """PSI per month and metric against the first ``reference_months`` months."""
+    """PSI per month and metric against the first ``reference_months`` months.
+
+    Months with fewer than ``min_rows`` rows are skipped: PSI on a handful of rows is noise.
+    """
     o = orders.merge(products[["item_id", "category"]], on="item_id")
     o["month"] = _month(o["order_ts"])
     r = reviews[["review_id", "rating", "review_ts"]].merge(labels, on="review_id")
@@ -72,7 +75,7 @@ def drift_table(
         base = counts(metric, frame[frame["month"].isin(ref)])
         for m in months[reference_months:]:
             cur = frame[frame["month"] == m]
-            if cur.empty:
+            if len(cur) < min_rows:
                 continue
             v = psi(base, counts(metric, cur))
             rows.append({"month": m, "metric": metric, "psi": round(v, 4), "status": status(v),

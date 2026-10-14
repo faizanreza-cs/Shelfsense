@@ -25,6 +25,34 @@ def test_sources_fall_back_to_the_next_one(tmp_path, monkeypatch):
         list(amazon._lines("reviews", "X"))
 
 
+def test_downloads_are_unzipped_by_their_header_not_their_name(monkeypatch):
+    import gzip as gz
+
+    import httpx
+
+    body = b'{"a": 1}\n{"a": 2}\n'
+
+    class Response:
+        def __init__(self, data):
+            self.data = data
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def raise_for_status(self):
+            pass
+
+        def iter_bytes(self, size):
+            yield from (self.data[i : i + 7] for i in range(0, len(self.data), 7))
+
+    for data in (body, gz.compress(body)):  # plain text, or gzip without a .gz name
+        monkeypatch.setattr(httpx, "stream", lambda *a, data=data, **k: Response(data))
+        assert [json.loads(x)["a"] for x in amazon._http_lines("https://x/f.jsonl")] == [1, 2]
+
+
 def test_fetch_runs_the_whole_pipeline_on_dataset_files(tmp_path, monkeypatch):
     data = synth.generate(synth.SynthConfig(n_users=12_000))
     amazon.to_amazon_format(data, tmp_path / "raw", "Health_and_Household")

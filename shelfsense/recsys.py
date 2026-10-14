@@ -237,6 +237,9 @@ class Recommender:
         """Top-k new item ids per user. ``rules``: in_stock_only, max_per_brand, margin_boost."""
         out: dict[str, list[str]] = {}
         rows_all = f.users.get_indexer(users)
+        if (rows_all < 0).any():  # -1 would silently pick the last shopper's row
+            unknown = [u for u, r in zip(users, rows_all, strict=True) if r < 0][:5]
+            raise KeyError(f"no purchase history for {unknown}; recommend best sellers instead")
         for b in range(0, len(users), batch):
             rows = rows_all[b : b + batch]
             s = self.scores(f, rows)

@@ -37,12 +37,26 @@ def _rules_for(products: pd.DataFrame) -> dict[str, Any]:
     return rules
 
 
+def data_end(ts: pd.Series, share: float = 0.5) -> pd.Timestamp:
+    """The last time with complete data: trailing months with less than ``share`` of the median
+    month's volume are dropped (a data dump's last months are often only partly collected)."""
+    months = ts.dt.to_period("M")
+    counts = months.value_counts().sort_index()
+    floor = share * counts.median()
+    last = len(counts)
+    while last > 1 and counts.iloc[last - 1] < floor:
+        last -= 1
+    if last == len(counts):
+        return pd.Timestamp(ts.max())
+    return pd.Timestamp(ts[months <= counts.index[last - 1]].max())
+
+
 def run_recommender(
     products: pd.DataFrame, orders: pd.DataFrame, reviews: pd.DataFrame
 ) -> tuple[dict[str, Any], pd.DataFrame, dict[str, Any]]:
     """Offline evaluation on the last ``HORIZON`` days, then refit on everything for serving."""
     inter = recsys.interactions(orders)
-    cutoff = (inter["ts"].max() - pd.Timedelta(days=HORIZON)).normalize()
+    cutoff = (data_end(inter["ts"]) - pd.Timedelta(days=HORIZON)).normalize()
     rec = recsys.Recommender(products)
     rec.train_reranker(inter, reviews, cutoff, horizon=HORIZON)
     f = rec.fit(inter, reviews, cutoff)

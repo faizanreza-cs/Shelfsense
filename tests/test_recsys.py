@@ -49,6 +49,25 @@ def test_recommendations_skip_owned_items_and_follow_rules():
     assert brands.value_counts().max() == 1
 
 
+def test_unknown_shoppers_are_an_error_not_someone_elses_list():
+    products, inter = _toy()
+    rec = recsys.Recommender(products, n_factors=2)
+    f = rec.fit(inter, None, pd.Timestamp("2025-02-01"))
+    with pytest.raises(KeyError, match="no purchase history"):
+        rec.recommend(f, ["u1", "nobody"], "popularity")
+
+
+def test_evaluation_ends_at_the_last_complete_month():
+    from shelfsense.pipeline import data_end
+
+    full = pd.Series(pd.date_range("2024-01-01", "2024-12-31 23:00", freq="h"))
+    assert data_end(full) == full.max()
+    # a dump whose last two months are nearly empty: evaluate up to the end of October
+    tail = pd.Series(pd.to_datetime(["2024-11-03", "2024-12-01", "2024-12-02"]))
+    sparse = pd.concat([full[full < "2024-11-01"], tail], ignore_index=True)
+    assert data_end(sparse) == full[full < "2024-11-01"].max()
+
+
 def test_evaluate_by_hand():
     recs = {"u": ["a", "b", "c"]}
     out = recsys.evaluate(recs, {"u": {"b", "z"}}, n_items=10)

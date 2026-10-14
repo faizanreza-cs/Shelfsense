@@ -29,6 +29,21 @@ def test_alert_fires_on_a_jump_and_not_on_noise():
     assert monitor.aspect_alerts(_monthly(neg_last=5)).empty
 
 
+def test_drift_skips_months_too_thin_to_measure():
+    months = pd.date_range("2025-01-01", periods=9, freq="MS")
+    rows = [(m + pd.Timedelta(days=d % 27), "A" if d % 3 else "B") for m in months[:8]
+            for d in range(300)]  # fmt: skip
+    rows += [(months[8], "B")] * 5  # a final month with 5 orders, all of category B
+    o = pd.DataFrame(rows, columns=["order_ts", "item_id"])
+    o["price"] = 10.0
+    products = pd.DataFrame({"item_id": ["A", "B"], "category": ["A", "B"]})
+    reviews = pd.DataFrame({"review_id": ["r1"], "rating": [5], "review_ts": [months[0]]})
+    labels = pd.DataFrame({"review_id": ["r1"], **dict.fromkeys(monitor.ASPECTS, "none")})
+    drift = monitor.drift_table(o, products, reviews, labels, reference_months=6)
+    assert set(drift["month"]) == {"2025-07", "2025-08"}  # September's 5 rows are skipped
+    assert (drift["status"] == "stable").all()
+
+
 def test_monitoring_finds_the_reformulation_and_nothing_else(built):
     m = built["monitoring"]
     t = m["truth_check"]

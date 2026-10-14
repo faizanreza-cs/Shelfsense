@@ -63,6 +63,11 @@ def test_snowflake_setup_has_a_read_only_role():
     assert analyst and not any(re.search(r"CREATE|INSERT|UPDATE|DELETE", g) for g in analyst)
 
 
-def test_charts_render(tmp_path):
+def test_charts_render(tmp_path, monkeypatch):
     paths = charts.render(tmp_path)
     assert len(paths) == 4 and all(p.stat().st_size > 10_000 for p in paths)
+    import shelfsense.queries
+
+    empty = pd.DataFrame(columns=["brand", "aspect", "mentions", "net_sentiment", "users"])
+    monkeypatch.setattr(shelfsense.queries, "run_saved", lambda name, wh: empty)
+    assert charts.brand_chart(tmp_path / "b.png") is None  # thin data: no chart, no crash

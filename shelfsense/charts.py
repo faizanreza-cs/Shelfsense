@@ -176,10 +176,12 @@ def monitoring_chart(res: dict, path: Path) -> Path:
     return _save(fig, path)
 
 
-def brand_chart(path: Path) -> Path:
+def brand_chart(path: Path) -> Path | None:
     from shelfsense.queries import run_saved
 
     df = run_saved("aspect_scorecard_by_brand", get_warehouse())
+    if df.empty:  # no brand has enough reviewers to show
+        return None
     top = df.groupby("brand")["mentions"].sum().nlargest(15).index  # real catalogues: many
     df = df[df["brand"].isin(top)]
     grid = df.pivot(index="brand", columns="aspect", values="net_sentiment")
@@ -213,5 +215,6 @@ def render(out: str | Path = "docs/img") -> list[Path]:
     paths = [recommender_chart(res, out / "recommenders.png")]
     if "perfect_labels_curve" in res["aspects"]:  # needs true labels: synthetic data only
         paths.append(labels_chart(res, out / "labels.png"))
-    paths += [monitoring_chart(res, out / "monitoring.png"), brand_chart(out / "brand_aspects.png")]
-    return paths
+    paths.append(monitoring_chart(res, out / "monitoring.png"))
+    brands = brand_chart(out / "brand_aspects.png")
+    return paths + ([brands] if brands else [])
