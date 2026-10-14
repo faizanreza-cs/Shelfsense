@@ -1,0 +1,56 @@
+name: Real data (Amazon Reviews 2023)
+
+# Manual run: downloads Health & Household reviews and metadata, keeps supplements, and runs
+# the same pipeline. The metrics are printed in the log and saved as an artifact.
+on:
+  workflow_dispatch:
+    inputs:
+      max_reviews:
+        description: "Most reviews to keep"
+        default: "300000"
+      max_items:
+        description: "Products to keep (most reviewed)"
+        default: "2000"
+      since:
+        description: "Reviews from this date"
+        default: "2021-01-01"
+      labeller:
+        description: "keyword, or llm (needs the ANTHROPIC_API_KEY secret and SHELFSENSE_MODEL variable)"
+        default: "keyword"
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      SHELFSENSE_PROVIDER: ${{ inputs.labeller == 'llm' && 'anthropic' || 'mock' }}
+      SHELFSENSE_MODEL: ${{ vars.SHELFSENSE_MODEL }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          uv venv --allow-existing .venv
+          uv pip install --python .venv/bin/python -e ".[llm,dev]"
+      - name: Fetch and run everything
+        run: >
+          .venv/bin/python -m shelfsense.cli fetch
+          --max-reviews ${{ inputs.max_reviews }} --max-items ${{ inputs.max_items }}
+          --since ${{ inputs.since }} --labeller ${{ inputs.labeller }}
+      - name: Results
+        run: |
+          echo "::group::results.json"
+          cat data/results.json
+          echo "::endgroup::"
+          .venv/bin/python -m shelfsense.cli monitor || true
+      - name: Charts
+        run: .venv/bin/python -m shelfsense.cli charts --out real-data/img
+      - uses: actions/upload-artifact@v4
+        with:
+          name: real-data-results
+          path: |
+            data/results.json
+            real-data/img/

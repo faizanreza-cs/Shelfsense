@@ -1,0 +1,62 @@
+// shelfsense measures for Power BI Desktop.
+// Data: `shelfsense export-powerbi` writes powerbi/data/*.csv. Create each measure with
+// Modeling > New measure, pasting one block at a time.
+
+// Sales page
+Orders = SUM ( fact_orders_monthly[orders] )
+
+Revenue = SUM ( fact_orders_monthly[revenue] )
+
+Average Order Value = DIVIDE ( [Revenue], [Orders] )
+
+// shoppers are distinct per month and product, so this is a monthly reach, not a unique count
+Shopper Months = SUM ( fact_orders_monthly[shoppers] )
+
+Revenue vs Last Year % =
+VAR ThisPeriod = [Revenue]
+VAR LastYear = CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( dim_month[month_start] ) )
+RETURN DIVIDE ( ThisPeriod - LastYear, LastYear )
+
+// Consumer insights page: aspect on columns, brand or product on rows
+Mentions = SUM ( fact_aspect_monthly[mentions] )
+
+Positive Mentions = SUM ( fact_aspect_monthly[positive] )
+
+Negative Mentions = SUM ( fact_aspect_monthly[negative] )
+
+Net Sentiment = DIVIDE ( [Positive Mentions] - [Negative Mentions], [Mentions] )
+
+Negative Share = DIVIDE ( [Negative Mentions], [Mentions] )
+
+Category Net Sentiment =
+CALCULATE ( [Net Sentiment], ALLEXCEPT ( dim_product, dim_product[category] ) )
+
+Net Sentiment vs Category = [Net Sentiment] - [Category Net Sentiment]
+
+// Model monitoring page
+Max PSI = MAX ( fact_drift_monthly[psi] )
+
+Drift Status =
+SWITCH ( TRUE (), [Max PSI] >= 0.25, "Drift", [Max PSI] >= 0.1, "Watch", "Stable" )
+
+Alerts = COUNTROWS ( fact_aspect_alerts )
+
+Alert Negative Share = MAX ( fact_aspect_alerts[negative_share] )
+
+Baseline Negative Share = MAX ( fact_aspect_alerts[baseline_negative_share] )
+
+// Recommender page
+Recall at 10 = AVERAGE ( fact_recommender_eval[recall_at_10] )
+
+NDCG at 10 = AVERAGE ( fact_recommender_eval[ndcg_at_10] )
+
+Catalogue Coverage = AVERAGE ( fact_recommender_eval[coverage] )
+
+Recommended Margin = AVERAGE ( fact_recommender_eval[avg_margin_pct] )
+
+Times Recommended = SUM ( fact_recommended_items[times_recommended] )
+
+Share of Recommendations =
+DIVIDE ( [Times Recommended], CALCULATE ( [Times Recommended], ALL ( dim_product ) ) )
+
+Aspect Model F1 = AVERAGE ( fact_aspect_model[f1] )

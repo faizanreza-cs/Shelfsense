@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          uv venv --allow-existing .venv
+          uv pip install --python .venv/bin/python -e ".[llm,dev]"
+      - name: Lint and type-check
+        run: make lint
+      - name: Tests
+        run: make test
+      - name: Build data and models
+        run: make build
+      - name: Agent eval (mock provider)
+        run: make eval
+      - name: Power BI export
+        run: make powerbi
+      - name: Monitoring (the synthetic store has a known alert, so exit 1 is expected)
+        run: .venv/bin/python -m shelfsense.cli monitor || test $? -eq 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: results
+          path: |
+            data/results.json
+            reports/
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t shelfsense .
+      - name: Smoke test
+        run: |
+          docker run --rm shelfsense python -c "from shelfsense.agent.core import Agent; from shelfsense.agent.provider import MockProvider; r = Agent(MockProvider()).ask('What do reviewers say about P0015?'); assert r.tools_used == ['product_insights'], r.tools_used; print(r.answer)"

@@ -1,0 +1,111 @@
+# Golden questions for the Insights Copilot agent.
+#
+# expected_tools: tools a competent analyst would use (graded: any one must be called)
+# truth:          named ground-truth function in run_evals.py; the figures it returns must appear
+#                 in the answer (within tolerance). Ground truth is read from the analysis results
+#                 and the warehouse at eval time, so it never drifts from the data.
+
+- id: saved_queries
+  question: Which saved queries can I run?
+  expected_tools: [list_saved_queries]
+  truth: saved_query_names
+
+- id: repeat_rate
+  question: Which category has the highest repeat purchase rate?
+  expected_tools: [run_saved_query]
+  truth: top_repeat_category
+
+- id: bought_together
+  question: Which two products are most often bought together?
+  expected_tools: [run_saved_query]
+  truth: top_pair
+
+- id: monthly_sales
+  question: Show monthly sales by category.
+  expected_tools: [run_saved_query, run_sql]
+  truth: first_month_sales
+
+- id: category_trend
+  question: How has review sentiment trended by category?
+  expected_tools: [run_saved_query]
+  truth: first_trend_row
+
+- id: best_brand
+  question: Which brand has the best review sentiment overall?
+  expected_tools: [brand_scorecard, run_saved_query]
+  truth: best_brand
+
+- id: brand_weakness
+  question: What is Vitalis Lab's weakest aspect compared with the store?
+  expected_tools: [brand_scorecard]
+  truth: vitalis_weakest
+
+- id: product_reviews
+  question: What do reviewers say about P0015?
+  expected_tools: [product_insights]
+  truth: p0015_taste
+
+- id: similar
+  question: What else do shoppers who buy P0015 tend to buy?
+  expected_tools: [similar_products, run_saved_query]
+  truth: p0015_similar
+
+- id: recommend
+  question: What should we recommend to shopper C000123 next?
+  expected_tools: [recommend_for_shopper]
+  truth: c000123_first
+
+- id: best_recommender
+  question: Which recommender has the best recall@10?
+  expected_tools: [recommender_metrics]
+  truth: hybrid_recall
+
+- id: rules_cost
+  question: How much recall do the business rules cost the recommender, and what happens to margin?
+  expected_tools: [recommender_metrics]
+  truth: rules_tradeoff
+
+- id: coverage
+  question: Which recommender covers the least of the catalogue?
+  expected_tools: [recommender_metrics]
+  truth: popularity_coverage
+
+- id: drift_latest
+  question: Is there any data drift in the latest month?
+  expected_tools: [monitoring_report]
+  truth: latest_drift
+
+- id: sudden_drop
+  question: Did any product's reviews suddenly get worse?
+  expected_tools: [monitoring_report, product_insights]
+  truth: alert_product
+
+- id: reformulation
+  question: When did the reformulated protein powder start getting complaints?
+  expected_tools: [monitoring_report, product_insights]
+  truth: alert_month
+
+- id: aspect_model
+  question: How good is the review aspect model?
+  expected_tools: [aspect_model_metrics]
+  truth: student_f1
+
+- id: labels_needed
+  question: How many labelled reviews does the student model need to be accurate?
+  expected_tools: [aspect_model_metrics]
+  truth: label_curve
+
+- id: sql_shoppers
+  question: Using SQL, how many shoppers have placed an order?
+  expected_tools: [run_sql]
+  truth: sql_shoppers
+
+- id: sql_revenue
+  question: Write SQL for revenue by category. Which category sells the most?
+  expected_tools: [run_sql, run_saved_query]
+  truth: sql_top_category
+
+- id: sql_ratings
+  question: With SQL, how many reviews give each star rating?
+  expected_tools: [run_sql]
+  truth: sql_five_stars

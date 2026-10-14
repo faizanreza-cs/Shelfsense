@@ -1,0 +1,171 @@
+{
+ "swagger": "2.0",
+ "info": {
+  "title": "shelfsense Insights Copilot",
+  "description": "Answers questions about products, reviews, recommendations and model health for a health and nutrition store, and returns product insights and recommendations.",
+  "version": "0.1.0"
+ },
+ "host": "your-api-host.example.com",
+ "basePath": "/",
+ "schemes": [
+  "https"
+ ],
+ "consumes": [
+  "application/json"
+ ],
+ "produces": [
+  "application/json"
+ ],
+ "securityDefinitions": {
+  "apiKey": {
+   "type": "apiKey",
+   "in": "header",
+   "name": "X-API-Key"
+  }
+ },
+ "security": [
+  {
+   "apiKey": []
+  }
+ ],
+ "paths": {
+  "/ask": {
+   "post": {
+    "operationId": "AskInsightsCopilot",
+    "summary": "Ask the Insights Copilot",
+    "description": "Answers one question about products, reviews, recommendations or monitoring, using the analysis tools. Returns the answer and the tools it used.",
+    "parameters": [
+     {
+      "name": "body",
+      "in": "body",
+      "required": true,
+      "schema": {
+       "$ref": "#/definitions/AskRequest"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "The answer",
+      "schema": {
+       "$ref": "#/definitions/AskResponse"
+      }
+     }
+    }
+   }
+  },
+  "/insights/{item_id}": {
+   "get": {
+    "operationId": "GetProductInsights",
+    "summary": "What reviewers say about a product",
+    "description": "Net sentiment per aspect (taste, digestion, effectiveness, value, packaging) vs the category, monitoring alerts and example reviews.",
+    "parameters": [
+     {
+      "name": "item_id",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "description": "Product id, e.g. P0015"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Insights",
+      "schema": {
+       "$ref": "#/definitions/ToolResult"
+      }
+     }
+    }
+   }
+  },
+  "/recommend/{user_id}": {
+   "get": {
+    "operationId": "RecommendProducts",
+    "summary": "Next products for a shopper",
+    "description": "Top products the shopper hasn't bought, from the hybrid recommender with business rules.",
+    "parameters": [
+     {
+      "name": "user_id",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "description": "Shopper id, e.g. C000123"
+     },
+     {
+      "name": "k",
+      "in": "query",
+      "required": false,
+      "type": "integer",
+      "description": "How many products (1-20, default 10)"
+     },
+     {
+      "name": "apply_rules",
+      "in": "query",
+      "required": false,
+      "type": "boolean",
+      "description": "Apply stock, brand and margin rules (default true)"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Recommendations",
+      "schema": {
+       "$ref": "#/definitions/ToolResult"
+      }
+     }
+    }
+   }
+  }
+ },
+ "definitions": {
+  "AskRequest": {
+   "type": "object",
+   "required": [
+    "question"
+   ],
+   "properties": {
+    "question": {
+     "type": "string",
+     "description": "The question, in plain English"
+    }
+   }
+  },
+  "AskResponse": {
+   "type": "object",
+   "properties": {
+    "answer": {
+     "type": "string"
+    },
+    "tools_used": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "provider": {
+     "type": "string"
+    },
+    "latency_ms": {
+     "type": "integer"
+    }
+   }
+  },
+  "ToolResult": {
+   "type": "object",
+   "properties": {
+    "rows": {
+     "type": "array",
+     "items": {
+      "type": "object"
+     }
+    },
+    "row_count": {
+     "type": "integer"
+    },
+    "note": {
+     "type": "string"
+    }
+   }
+  }
+ }
+}
