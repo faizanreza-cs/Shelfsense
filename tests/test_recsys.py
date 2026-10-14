@@ -57,6 +57,24 @@ def test_unknown_shoppers_are_an_error_not_someone_elses_list():
         rec.recommend(f, ["u1", "nobody"], "popularity")
 
 
+def test_ties_go_to_the_earlier_product_on_every_cpu():
+    # numpy's default sort orders ties differently on CPUs with and without AVX-512, which
+    # changed the real-data results between runners
+    n = 600
+    ids = [f"P{i:04d}" for i in range(n)]
+    products = pd.DataFrame({"item_id": ids, "title": [f"Product {i}" for i in range(n)],
+                             "brand": [f"B{i % 40}" for i in range(n)], "category": "Vitamins",
+                             "price": 10.0})  # fmt: skip
+    inter = pd.DataFrame({"user_id": [f"u{i}" for i in range(n)], "item_id": ids,
+                          "ts": pd.Timestamp("2025-01-01")})  # fmt: skip
+    rec = recsys.Recommender(products, n_factors=2)
+    f = rec.fit(inter, None, pd.Timestamp("2025-02-01"))  # every product bought once: all tie
+    assert rec.recommend(f, ["u0"], "popularity")["u0"] == ids[1:11]
+    rows = f.users.get_indexer(["u0"])
+    cand, _ = rec._candidates(f, rows, rec.scores(f, rows))
+    assert list(cand[0, : recsys.POOL]) == list(range(1, recsys.POOL + 1))
+
+
 def test_evaluation_ends_at_the_last_complete_month():
     from shelfsense.pipeline import data_end
 

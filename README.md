@@ -19,7 +19,7 @@ real Amazon reviews.
 | Question | Method | Result |
 |---|---|---|
 | What should each shopper buy next? | Popularity, item-item, SVD and TF-IDF candidates, re-ranked by a logistic regression | Recall@10 **0.275** on the next 90 days (item-item alone 0.272, popularity 0.238) |
-| What do business rules cost? | In stock only, at most 3 per brand, margin boost | Recall@10 -0.9 pts, average margin of recommendations **+1.6 pts** (30.3% to 31.9%) |
+| What do business rules cost? | In stock only, at most 3 per brand, margin boost | Recall@10 -0.8 pts, average margin of recommendations **+1.6 pts** (30.3% to 31.9%) |
 | What do reviewers say? | Keyword rules label 2,000 reviews; a TF-IDF + logistic regression model learns from them and scores all 42,285 | Macro-F1 **0.896** against the true labels; product scores track true quality (Spearman 0.94-0.96) |
 | Are better labels worth it? | The same model trained on perfect labels | Macro-F1 **0.985** from just 500 labels: label quality is the limit, which is the case for LLM labels |
 | Did anything go wrong? | Each product-aspect's negative share each month, against its own history | Flagged the reformulated protein in **2026-05, the month it changed** (85% negative vs 15% before), and nothing else |
@@ -36,9 +36,9 @@ bought for the first time in the next 90 days.
 | Popularity | 0.238 | 0.132 | 8.8% | 28.2% |
 | Item-item ("bought together") | 0.272 | 0.160 | 88.8% | 31.0% |
 | SVD (matrix factorisation) | 0.116 | 0.057 | 50.8% | 35.3% |
-| Content (TF-IDF on titles, brands, flavours) | 0.084 | 0.041 | 100% | 34.2% |
-| **Hybrid** (learned re-ranker) | **0.275** | **0.161** | 42.9% | 30.3% |
-| Hybrid + business rules | 0.266 | 0.158 | 40.8% | **31.9%** |
+| Content (TF-IDF on titles, brands, flavours) | 0.083 | 0.041 | 100% | 34.2% |
+| **Hybrid** (learned re-ranker) | **0.275** | **0.161** | 42.5% | 30.3% |
+| Hybrid + business rules | 0.267 | 0.158 | 41.2% | **31.9%** |
 
 The re-ranker takes the top 30 candidates from each model and scores them with each model's
 rank, popularity, price, rating, category fit and brand fit. It learns from three earlier
@@ -217,10 +217,10 @@ translation; on Snowflake the same files run unchanged.
 
 ## Tests and evals
 
-- **91 tests**, all offline:
+- **92 tests**, all offline:
   - The simulator's determinism and true labels.
-  - Recommender maths by hand (similarity, NDCG, rules, new-item targets) and the hybrid against
-    the baselines.
+  - Recommender maths by hand (similarity, NDCG, rules, new-item targets, the same tie order on
+    every CPU) and the hybrid against the baselines.
   - The keyword labeller on tricky sentences, the student model, F1, and the LLM labeller and
     structured outputs with fake Anthropic and OpenAI clients.
   - PSI by hand, alerts on a spike and not on noise, and the reformulation found in the right

@@ -19,6 +19,10 @@ brand, and an optional boost for higher-margin products.
 
 Evaluation: 10 *new* products per shopper (not bought before the cutoff) against what they
 bought in the next ``horizon`` days. Metrics: recall@10, NDCG@10 and catalogue coverage.
+
+Every ranking uses a stable sort, so ties go to the earlier product. numpy's default sort orders
+ties differently on CPUs with and without AVX-512, and a real catalogue has many ties (products
+bought equally often, or never together), so results would change from machine to machine.
 """
 
 from __future__ import annotations
@@ -147,7 +151,7 @@ class Recommender:
         """
         r = np.repeat(np.arange(len(rows)), cand.shape[1])
         it = cand.ravel()
-        ranks = [(-s[m]).argsort(axis=1).argsort(axis=1)[r, it] for m in MODELS]
+        ranks = [(-s[m]).argsort(axis=1, kind="stable").argsort(axis=1)[r, it] for m in MODELS]
         prices = self.products["price"].to_numpy()[it]
         feats = np.column_stack(
             [
@@ -174,7 +178,7 @@ class Recommender:
         picks = []
         for m in MODELS:
             sc = np.where(owned, -np.inf, s[m])
-            picks.append(np.argsort(-sc, axis=1)[:, :POOL])
+            picks.append(np.argsort(-sc, axis=1, kind="stable")[:, :POOL])
         allc = np.concatenate(picks, axis=1)
         out = np.empty((len(rows), allc.shape[1]), dtype=int)
         real = np.zeros(out.shape, dtype=bool)
@@ -268,12 +272,12 @@ class Recommender:
             finite = np.isfinite(sc)
             # rank-based so the boost means the same for every model's score scale
             ranks = np.full(len(sc), np.inf)
-            ranks[finite] = (-sc[finite]).argsort().argsort()
+            ranks[finite] = (-sc[finite]).argsort(kind="stable").argsort()
             sc = np.where(finite, -ranks * (1 - boost * (m - m.mean()) / m.std()), -np.inf)
         cap = rules.get("max_per_brand")
         picked: list[int] = []
         per_brand: dict[int, int] = {}
-        for j in np.argsort(-sc):
+        for j in np.argsort(-sc, kind="stable"):
             if not np.isfinite(sc[j]) or len(picked) == k:
                 break
             b = int(self.brand_codes[j])
@@ -286,7 +290,7 @@ class Recommender:
     def similar(self, f: Fitted, item_id: str, k: int = K) -> list[tuple[str, float]]:
         """Customers who bought this also bought (item-item similarity)."""
         j = self.items.get_loc(item_id)
-        order = np.argsort(-f.sim[j])[:k]
+        order = np.argsort(-f.sim[j], kind="stable")[:k]
         return [(self.item_ids[i], round(float(f.sim[j, i]), 4)) for i in order]
 
 

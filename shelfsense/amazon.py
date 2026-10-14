@@ -237,7 +237,7 @@ def tables_from(
             if (r["u"], r["i"], r["t"]) in want:
                 rows.append(r)
     rev = pd.DataFrame(rows).drop_duplicates(["u", "i"], keep="last")
-    rev = rev.sort_values("t").reset_index(drop=True)
+    rev = rev.sort_values("t", kind="stable").reset_index(drop=True)
     shopper = {u: f"C{n + 1:06d}" for n, u in enumerate(sorted(rev["u"].unique()))}
     prod = pd.DataFrame.from_dict(items, orient="index").loc[sorted(rev["i"].unique())]
     prod = prod.rename_axis("item_id").reset_index()

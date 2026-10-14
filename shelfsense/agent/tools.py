@@ -115,7 +115,7 @@ def t_recommend_for_shopper(user_id: str, k: int = 10, apply_rules: bool = True)
     rec, f = m["recommender"], m["fitted"]
     k = max(1, min(int(k), 20))
     if user_id not in f.users:
-        top = list(rec.items[(-f.pop).argsort()[:k]])
+        top = list(rec.items[(-f.pop).argsort(kind="stable")[:k]])
         return _ok(_with_products(top), note=f"{user_id} has no purchases: best sellers instead.")
     rules = m["rules"] if apply_rules else None
     ids = rec.recommend(f, [user_id], "hybrid", k=k, rules=rules)[user_id]
