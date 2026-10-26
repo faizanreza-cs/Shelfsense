@@ -65,3 +65,8 @@ files = ["shelfsense"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+
+[tool.uv]
+# The Snowflake connector's pandas extra holds pandas at 2.3, which predates NumPy 2.5 and sets
+# off its deprecation warnings; NumPy stays below 2.5 until the connector allows pandas 3.
+constraint-dependencies = ["numpy<2.5"]
