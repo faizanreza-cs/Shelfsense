@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShelfSense: recommendations, review insights and monitoring</title>
+<meta name="description" content="ShelfSense recommends products, reads review sentiment and flags products going wrong, checked against a simulator and run on 91,227 real Amazon reviews.">
+<link rel="canonical" href="https://faizanreza-cs.github.io/Shelfsense/">
+<meta name="author" content="Faizan Reza">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#ffffff">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ShelfSense">
+<meta property="og:title" content="ShelfSense: recommendations, review insights and monitoring">
+<meta property="og:description" content="ShelfSense recommends products, reads review sentiment and flags products going wrong, checked against a simulator and run on 91,227 real Amazon reviews.">
+<meta property="og:url" content="https://faizanreza-cs.github.io/Shelfsense/">
+<meta property="og:image" content="https://faizanreza-cs.github.io/Shelfsense/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ShelfSense: What will they buy next?">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@cs_faizan">
+<link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/touch-icon.png">
+<link rel="preload" href="assets/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/styles.css">
+<style>:root{--a:#A86E00;--a-50:#F9F5EF;--a-100:#F3EADF;--a-200:#E6D3BC;--a-400:#C1965E;--pop-1:#14B8A6;--pop-2:#EC4899;--a-ink:#966200}</style>
+<script>(function(h){if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&!location.hash)h.classList.add("loading")})(document.documentElement)</script>
+<script src="assets/app.js" defer></script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "ShelfSense", "description": "ShelfSense recommends products, reads review sentiment and flags products going wrong, checked against a simulator and run on 91,227 real Amazon reviews.", "url": "https://faizanreza-cs.github.io/Shelfsense/", "codeRepository": "https://github.com/faizanreza-cs/Shelfsense", "programmingLanguage": "Python", "license": "https://opensource.org/licenses/MIT", "author": {"@type": "Person", "name": "Faizan Reza", "url": "https://github.com/faizanreza-cs", "sameAs": ["https://www.linkedin.com/in/faizanreza", "https://x.com/cs_faizan"]}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="loader" aria-hidden="true">
+  <img src="assets/mark.svg" alt="" width="56" height="56">
+  <div class="loader-num">0</div>
+  <div class="loader-bar"><i></i></div>
+  <p class="label">Getting things ready</p>
+</div>
+
+<header class="nav" id="top">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top"><img src="assets/logo.svg" alt="ShelfSense, back to top" width="119" height="30"></a>
+    <nav aria-label="Sections"><ul class="nav-links"><li><a href="#overview">Overview</a></li><li><a href="#how">How it works</a></li><li><a href="#features">Features</a></li><li><a href="#results">Results</a></li><li><a href="#use">Use it</a></li><li><a href="#faq">FAQ</a></li></ul></nav>
+    <a class="btn btn-dark" href="https://github.com/faizanreza-cs/Shelfsense">GitHub <svg class="out" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 7h10v10"/> <path d="M7 17 17 7"/></svg></a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-inner">
+      <h1 class="hero-title" id="hero-title"><span class="line">What will</span> <span class="line">they buy</span> <span class="line"><span class="outline">next?</span></span></h1>
+      <p class="hero-sub">Recommendations, review insights and monitoring for a consumer health store, checked against a simulator that knows the truth, then run on real Amazon reviews.</p>
+      <div class="hero-cta">
+        <a class="btn btn-dark" href="https://github.com/faizanreza-cs/Shelfsense">View on GitHub <svg class="go" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/> <path d="m12 5 7 7-7 7"/></svg></a>
+        <a class="btn btn-ghost" href="#results">See the results</a>
+      </div>
+    </div>
+    <div class="hero-scroll" aria-hidden="true"><span class="label">Scroll</span><span class="bar"></span></div>
+    <div class="hero-year"><p class="label">2026</p><strong>Recommend. Read. Monitor.</strong></div>
+  </section>
+
+  <section class="overview" id="overview" aria-label="Overview">
+    <div class="wrap"><p class="lit"><span class="w">A</span> <span class="w">consumer</span> <span class="w">health</span> <span class="w">brand&#x27;s</span> <span class="w">insights</span> <span class="w">team</span> <span class="w">asks</span> <span class="w">three</span> <span class="w">questions</span> <span class="w">every</span> <span class="w">month.</span> <span class="w">What</span> <span class="w">should</span> <span class="w">each</span> <span class="w">shopper</span> <span class="w">buy</span> <span class="w">next?</span> <span class="w">What</span> <span class="w">are</span> <span class="w">reviewers</span> <span class="w">saying</span> <span class="w">about</span> <span class="w">taste,</span> <span class="w">digestion,</span> <span class="w">effectiveness,</span> <span class="w">value</span> <span class="w">and</span> <span class="w">packaging?</span> <span class="w">Is</span> <span class="w">anything</span> <span class="w">going</span> <span class="w">wrong?</span> <span class="w">ShelfSense</span> <span class="w">answers</span> <span class="w">all</span> <span class="w">three</span> <span class="w">on</span> <span class="w">a</span> <span class="w">simulated</span> <span class="w">store</span> <span class="w">that</span> <span class="w">knows</span> <span class="w">the</span> <span class="w">truth,</span> <span class="w">then</span> <span class="w">on</span> <span class="w">real</span> <span class="w">Amazon</span> <span class="w">reviews.</span></p></div>
+  </section>
+
+  <section class="how" id="how" aria-labelledby="how-title">
+    <div class="wrap"><p class="label how-label">How it works</p></div>
+    <div class="pin">
+      <div class="sticky">
+        <div class="steps-track" tabindex="0" role="group" aria-label="How it works, step by step">
+          <article class="step-intro card">
+            <h2 id="how-title">From orders and reviews to answers.</h2>
+            <p>The same code runs on a simulated store that knows the truth and on 91,227 real reviews.</p>
+          </article>
+          <article class="step card">
+            <div class="step-tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/> <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/> <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/> <path d="M2 7h20"/> <path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg></div>
+            <svg class="step-ghost" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/> <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/> <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/> <path d="M2 7h20"/> <path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg>
+            <svg class="viz" viewBox="0 0 210 210" aria-hidden="true" focusable="false">
+  <rect x="55" y="26" width="100" height="140" rx="16" class="f-white k-line"/>
+  <rect x="73" y="54" width="64" height="9" rx="4.5" class="f-a200"/>
+  <rect x="73" y="76" width="50" height="9" rx="4.5" class="f-line"/>
+  <rect x="73" y="98" width="58" height="9" rx="4.5" class="f-line"/>
+  <rect x="73" y="120" width="40" height="9" rx="4.5" class="f-line"/>
+  <rect class="scan" x="44" y="42" width="122" height="5" rx="2.5" fill-opacity=".9" style="fill:var(--a)"/>
+  <rect class="float" x="30" y="150" width="12" height="12" rx="3" style="fill:var(--pop-2)"/>
+  <circle class="float b" cx="174" cy="44" r="5" style="fill:var(--pop-1)"/>
+</svg>
+            <p class="label">01</p>
+            <h3>Simulate</h3>
+            <p>A store with a hidden truth</p>
+          </article>
+          <article class="step card">
+            <div class="step-tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1"/> <circle cx="19" cy="21" r="1"/> <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></div>
+            <svg class="step-ghost" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1"/> <circle cx="19" cy="21" r="1"/> <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+            <svg class="viz" viewBox="0 0 210 210" aria-hidden="true" focusable="false">
+  <rect x="34" y="58" width="104" height="70" rx="14" class="f-white k-line"/>
+  <rect x="50" y="76" width="58" height="9" rx="4.5" class="f-a200"/>
+  <rect x="50" y="96" width="42" height="9" rx="4.5" class="f-line"/>
+  <circle class="ripple" cx="126" cy="112" r="20"/>
+  <g class="bob"><path d="M126 112 L126 172 L141 157 L153 182 L165 176 L153 151 L174 151 Z" class="f-a"/></g>
+  <rect class="float f-p2" x="160" y="44" width="11" height="11" rx="3"/>
+</svg>
+            <p class="label">02</p>
+            <h3>Recommend</h3>
+            <p>Four models and a learned re-ranker</p>
+          </article>
+          <article class="step card">
+            <div class="step-tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19"/> <path d="M9.586 5.586A2 2 0 0 0 8.172 5H3a1 1 0 0 0-1 1v5.172a2 2 0 0 0 .586 1.414L8.29 18.29a2.426 2.426 0 0 0 3.42 0l3.58-3.58a2.426 2.426 0 0 0 0-3.42z"/> <circle cx="6.5" cy="9.5" r=".5" fill="currentColor"/></svg></div>
+            <svg class="step-ghost" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19"/> <path d="M9.586 5.586A2 2 0 0 0 8.172 5H3a1 1 0 0 0-1 1v5.172a2 2 0 0 0 .586 1.414L8.29 18.29a2.426 2.426 0 0 0 3.42 0l3.58-3.58a2.426 2.426 0 0 0 0-3.42z"/> <circle cx="6.5" cy="9.5" r=".5" fill="currentColor"/></svg>
+            <svg class="viz" viewBox="0 0 210 210" aria-hidden="true" focusable="false">
+  <circle cx="105" cy="105" r="66" class="k-a200"/>
+  <circle cx="105" cy="105" r="50" class="f-a50"/>
+  <g class="orbit"><circle cx="105" cy="39" r="8" class="f-a"/></g>
+  <g class="orbit b"><circle cx="171" cy="105" r="6.5" class="f-p1"/></g>
+  <g class="orbit c"><circle cx="105" cy="171" r="5.5" class="f-p2"/></g>
+  <circle class="pulse f-a" cx="105" cy="105" r="13"/>
+</svg>
+            <p class="label">03</p>
+            <h3>Label</h3>
+            <p>Aspect sentiment for every review</p>
+          </article>
+          <article class="step card">
+            <div class="step-tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg></div>
+            <svg class="step-ghost" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
+            <svg class="viz" viewBox="0 0 210 210" aria-hidden="true" focusable="false">
+  <rect class="grow" x="40" y="88" width="24" height="96" rx="12" style="fill:var(--a-200)"/>
+  <rect class="grow" x="76" y="40" width="24" height="144" rx="12" style="fill:var(--a)"/>
+  <rect class="grow" x="112" y="64" width="24" height="120" rx="12" style="fill:var(--pop-1)"/>
+  <rect class="grow" x="148" y="28" width="24" height="156" rx="12" style="fill:var(--pop-2)"/>
+</svg>
+            <p class="label">04</p>
+            <h3>Monitor</h3>
+            <p>Drift and product alerts, every month</p>
+          </article>
+          <article class="step card">
+            <div class="step-tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+            <svg class="step-ghost" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <svg class="viz" viewBox="0 0 210 210" aria-hidden="true" focusable="false">
+  <g class="twinkle"><path d="M105 30 C110 78 132 100 180 105 C132 110 110 132 105 180 C100 132 78 110 30 105 C78 100 100 78 105 30 Z" class="f-a"/></g>
+  <g class="twinkle" style="animation-delay:-1.5s"><path d="M168 30 C169 42 174 47 186 48 C174 49 169 54 168 66 C167 54 162 49 150 48 C162 47 167 42 168 30 Z" class="f-p1"/></g>
+  <rect class="float f-p2" x="40" y="156" width="12" height="12" rx="3"/>
+</svg>
+            <p class="label">05</p>
+            <h3>Ask</h3>
+            <p>An agent that cites review ids</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" id="features" aria-labelledby="features-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title reveal" id="features-title">Insights a category team can use.</h2>
+        <p class="reveal" style="--d:.1s">Recommendations, review sentiment and monitoring, each measured against the truth.</p>
+      </div>
+      <div class="grid3">
+          <article class="feature card reveal" style="--d:0.00s">
+            <div class="tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/> <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/> <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg></div>
+            <h3>A learned re-ranker</h3>
+            <p>Popularity, item-item, SVD and content candidates, re-ranked by a model trained on earlier windows.</p>
+            <p class="label">01</p>
+          </article>
+          <article class="feature card reveal" style="--d:0.08s">
+            <div class="tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="21" x2="14" y1="4" y2="4"/> <line x1="10" x2="3" y1="4" y2="4"/> <line x1="21" x2="12" y1="12" y2="12"/> <line x1="8" x2="3" y1="12" y2="12"/> <line x1="21" x2="16" y1="20" y2="20"/> <line x1="12" x2="3" y1="20" y2="20"/> <line x1="14" x2="14" y1="2" y2="6"/> <line x1="8" x2="8" y1="10" y2="14"/> <line x1="16" x2="16" y1="18" y2="22"/></svg></div>
+            <h3>Business rules, priced</h3>
+            <p>In stock only, at most 3 per brand, a margin boost: what they cost in recall is measured.</p>
+            <p class="label">02</p>
+          </article>
+          <article class="feature card reveal" style="--d:0.16s">
+            <div class="tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/> <path d="M8 12a2 2 0 0 0 2-2V8H8"/> <path d="M14 12a2 2 0 0 0 2-2V8h-2"/></svg></div>
+            <h3>Review aspects</h3>
+            <p>Taste, digestion, effectiveness, value and packaging: positive, negative or not mentioned.</p>
+            <p class="label">03</p>
+          </article>
+          <article class="feature card reveal" style="--d:0.00s">
+            <div class="tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/> <path d="M20 3v4"/> <path d="M22 5h-4"/> <path d="M4 17v2"/> <path d="M5 18H3"/></svg></div>
+            <h3>LLM labels, cheap scoring</h3>
+            <p>An LLM labels a few hundred reviews; a TF-IDF student model scores the rest.</p>
+            <p class="label">04</p>
+          </article>
+          <article class="feature card reveal" style="--d:0.08s">
+            <div class="tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/> <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/> <path d="M4 2C2.8 3.7 2 5.7 2 8"/> <path d="M22 8c0-2.3-.8-4.3-2-6"/></svg></div>
+            <h3>Product alerts</h3>
+            <p>Each product-aspect&#x27;s negative share each month, against its own history.</p>
+            <p class="label">05</p>
+          </article>
+          <article class="feature card reveal" style="--d:0.16s">
+            <div class="tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/> <path d="m9 12 2 2 4-4"/></svg></div>
+            <h3>Shopper privacy</h3>
+            <p>Shopper ids are never returned, and saved queries drop groups under 50 shoppers.</p>
+            <p class="label">06</p>
+          </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="results" id="results" aria-labelledby="results-title">
+    <div class="wrap">
+      <div class="panel card">
+        <p class="label">Results</p>
+        <h2 id="results-title">Checked against<br>the truth.</h2>
+        <p class="note">Recommender numbers from 91,227 real Amazon supplement reviews (2021 to 2023); the alert and the label scores from the simulated store.</p>
+        <div class="frame">
+            <div class="metric">
+              <div class="metric-top"><span class="label">01</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/> <polyline points="16 7 22 7 22 13"/></svg></div>
+              <b>+28%</b>
+              <p>recall@10 of the learned hybrid over the best single model, tested on 4,590 real shoppers.</p>
+            </div>
+            <div class="metric">
+              <div class="metric-top"><span class="label">02</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/> <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/> <path d="M4 2C2.8 3.7 2 5.7 2 8"/> <path d="M22 8c0-2.3-.8-4.3-2-6"/></svg></div>
+              <b>2026-05</b>
+              <p>the month the simulated protein powder changed recipe, and the month it was flagged. Nothing else raised an alert.</p>
+            </div>
+            <div class="metric">
+              <div class="metric-top"><span class="label">03</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19"/> <path d="M9.586 5.586A2 2 0 0 0 8.172 5H3a1 1 0 0 0-1 1v5.172a2 2 0 0 0 .586 1.414L8.29 18.29a2.426 2.426 0 0 0 3.42 0l3.58-3.58a2.426 2.426 0 0 0 0-3.42z"/> <circle cx="6.5" cy="9.5" r=".5" fill="currentColor"/></svg></div>
+              <b>0.896</b>
+              <p>macro-F1 of the review model trained on keyword labels; 0.985 from just 500 perfect labels.</p>
+            </div>
+        </div>
+        <figure class="chart">
+          <img src="assets/real_recommenders.png" alt="Two bar charts from the offline test on 4,590 real shoppers. Recall@10: popularity 0.025, item-item 0.059, SVD 0.036, content 0.066, learned hybrid 0.084, hybrid with business rules 0.084. Catalogue coverage: 0.7%, 99.8%, 11.1%, 94.3%, 72.8% and 69.7%." width="1667" height="744" loading="lazy" decoding="async">
+          <figcaption>Real Amazon reviews: the learned hybrid has the best recall, from a narrower slice of the catalogue.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <div class="band"><div class="wrap band-grid"><div><b>91,227</b><span class="label">Real reviews</span></div><div><b>24,214</b><span class="label">Real shoppers</span></div><div><b>1,975</b><span class="label">Real products</span></div></div></div>
+  </section>
+
+  <section class="uses" id="uses" aria-labelledby="uses-title">
+    <input class="sr-only" type="checkbox" id="pause-uses">
+    <div class="wrap uses-head">
+      <div>
+        <h2 class="sec-title reveal" id="uses-title">For the questions<br>insights teams ask.</h2>
+        <p class="uses-intro reveal" style="--d:.1s">What to recommend, what reviewers say, and whether anything is going wrong.</p>
+      </div>
+      <label class="pause" for="pause-uses"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="14" y="4" width="4" height="16" rx="1"/> <rect x="6" y="4" width="4" height="16" rx="1"/></svg> Pause</label>
+    </div>
+    <div class="marquee">
+      <div class="marquee-track">
+        <div class="set">
+            <article class="use card">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1"/> <circle cx="19" cy="21" r="1"/> <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+              <h3>Next best product</h3>
+              <p>Recommendations for every shopper, within business rules.</p>
+              <p class="for">For e-commerce teams</p>
+              <p class="label">01</p>
+            </article>
+            <article class="use card">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/> <path d="M8 12a2 2 0 0 0 2-2V8H8"/> <path d="M14 12a2 2 0 0 0 2-2V8h-2"/></svg>
+              <h3>What reviewers say</h3>
+              <p>Aspect sentiment by brand, product and month.</p>
+              <p class="for">For consumer insights</p>
+              <p class="label">02</p>
+            </article>
+            <article class="use card">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 18v-6a5 5 0 1 1 10 0v6"/> <path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z"/> <path d="M21 12h1"/> <path d="M18.5 4.5 18 5"/> <path d="M2 12h1"/> <path d="M12 2v1"/> <path d="m4.929 4.929.707.707"/> <path d="M12 12v6"/></svg>
+              <h3>A recipe gone wrong</h3>
+              <p>An alert the month a product&#x27;s reviews turn.</p>
+              <p class="for">For quality and brand teams</p>
+              <p class="label">03</p>
+            </article>
+            <article class="use card">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"/> <path d="m7 16.5-4.74-2.85"/> <path d="m7 16.5 5-3"/> <path d="M7 16.5v5.17"/> <path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"/> <path d="m17 16.5-5-3"/> <path d="m17 16.5 4.74-2.85"/> <path d="M17 16.5v5.17"/> <path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"/> <path d="M12 8 7.26 5.15"/> <path d="m12 8 4.74-2.85"/> <path d="M12 13.5V8"/></svg>
+              <h3>Bought together</h3>
+              <p>Pairs with lift, from a saved query.</p>
+              <p class="for">For category managers</p>
+              <p class="label">04</p>
+            </article>
+            <article class="use card">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
+              <h3>Is the feed broken?</h3>
+              <p>Drift in the store&#x27;s mix, month by month.</p>
+              <p class="for">For data teams</p>
+              <p class="label">05</p>
+            </article>
+            <article class="use card">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <h3>Ask the data</h3>
+              <p>An agent that cites review ids.</p>
+              <p class="for">For the whole brand team</p>
+              <p class="label">06</p>
+            </article>
+        </div>
+        <div class="set dup" aria-hidden="true">
+            <article class="use card">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1"/> <circle cx="19" cy="21" r="1"/> <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+              <h3>Next best product</h3>
+              <p>Recommendations for every shopper, within business rules.</p>
+              <p class="for">For e-commerce teams</p>
+              <p class="label">01</p>
+            </article>
+            <article class="use card">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/> <path d="M8 12a2 2 0 0 0 2-2V8H8"/> <path d="M14 12a2 2 0 0 0 2-2V8h-2"/></svg>
+              <h3>What reviewers say</h3>
+              <p>Aspect sentiment by brand, product and month.</p>
+              <p class="for">For consumer insights</p>
+              <p class="label">02</p>
+            </article>
+            <article class="use card">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 18v-6a5 5 0 1 1 10 0v6"/> <path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z"/> <path d="M21 12h1"/> <path d="M18.5 4.5 18 5"/> <path d="M2 12h1"/> <path d="M12 2v1"/> <path d="m4.929 4.929.707.707"/> <path d="M12 12v6"/></svg>
+              <h3>A recipe gone wrong</h3>
+              <p>An alert the month a product&#x27;s reviews turn.</p>
+              <p class="for">For quality and brand teams</p>
+              <p class="label">03</p>
+            </article>
+            <article class="use card">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"/> <path d="m7 16.5-4.74-2.85"/> <path d="m7 16.5 5-3"/> <path d="M7 16.5v5.17"/> <path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"/> <path d="m17 16.5-5-3"/> <path d="m17 16.5 4.74-2.85"/> <path d="M17 16.5v5.17"/> <path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"/> <path d="M12 8 7.26 5.15"/> <path d="m12 8 4.74-2.85"/> <path d="M12 13.5V8"/></svg>
+              <h3>Bought together</h3>
+              <p>Pairs with lift, from a saved query.</p>
+              <p class="for">For category managers</p>
+              <p class="label">04</p>
+            </article>
+            <article class="use card">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
+              <h3>Is the feed broken?</h3>
+              <p>Drift in the store&#x27;s mix, month by month.</p>
+              <p class="for">For data teams</p>
+              <p class="label">05</p>
+            </article>
+            <article class="use card">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <h3>Ask the data</h3>
+              <p>An agent that cites review ids.</p>
+              <p class="for">For the whole brand team</p>
+              <p class="label">06</p>
+            </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="use-it" id="use" aria-labelledby="use-title">
+    <div class="wrap">
+      <h2 class="center-title reveal" id="use-title">Run it, or have it built.</h2>
+      <div class="plans">
+        <article class="plan reveal">
+          <div class="plan-head"><h3>Run it yourself</h3><span class="badge"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="16 18 22 12 16 6"/> <polyline points="8 6 2 12 8 18"/></svg> Open source</span></div>
+          <p class="plan-text">Free under the MIT license. The build takes about a minute. No API key needed.</p>
+          <ol class="cmds">
+            <li>
+              <div class="cmd-head"><p class="cmd-label">Clone</p><button class="copy" type="button" hidden>Copy</button></div>
+              <div class="cmd"><pre><code>git clone https://github.com/faizanreza-cs/shelfsense &amp;&amp; cd shelfsense</code></pre></div>
+            </li>
+            <li>
+              <div class="cmd-head"><p class="cmd-label">Install</p><button class="copy" type="button" hidden>Copy</button></div>
+              <div class="cmd"><pre><code>make setup</code></pre></div>
+            </li>
+            <li>
+              <div class="cmd-head"><p class="cmd-label">Build, then recommend</p><button class="copy" type="button" hidden>Copy</button></div>
+              <div class="cmd"><pre><code>make build
+shelfsense recommend C000123</code></pre></div>
+            </li>
+          </ol>
+          <div class="plan-foot"><a class="btn btn-accent btn-block" href="https://github.com/faizanreza-cs/Shelfsense">View on GitHub <svg class="go" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/> <path d="m12 5 7 7-7 7"/></svg></a></div>
+        </article>
+        <article class="plan featured reveal" style="--d:.1s">
+          <div class="plan-head"><h3>Work with me</h3><span class="badge"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/> <rect width="20" height="14" x="2" y="6" rx="2"/></svg> For teams</span></div>
+          <p class="plan-text">I build recommenders, review analytics and AI agents like this one for consumer health and CPG teams.</p>
+          <ul class="checks"><li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg><span>ShelfSense on your store&#x27;s orders and reviews</span></li><li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg><span>Recommenders and review analytics with honest evaluation</span></li><li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg><span>Monitoring that catches a product going wrong</span></li><li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg><span>LLM agents with guardrails, evals and citations</span></li></ul>
+          <p class="callout"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m11 17 2 2a1 1 0 1 0 3-3"/> <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/> <path d="m21 3 1 11h-2"/> <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/> <path d="M3 4h8"/></svg> Open to freelance projects and full-time roles.</p>
+          <div class="plan-foot">
+            <a class="btn btn-dark btn-block" href="mailto:faizanreza01@gmail.com?subject=ShelfSense">Email me <svg class="go" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/> <path d="m12 5 7 7-7 7"/></svg></a>
+            <div class="socials">
+              <a class="btn btn-ghost" href="https://www.linkedin.com/in/faizanreza"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/> <rect width="4" height="12" x="2" y="9"/> <circle cx="4" cy="4" r="2"/></svg> LinkedIn</a>
+              <a class="btn btn-ghost" href="https://x.com/cs_faizan"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg> <span class="sr-only">Follow on</span> X</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq" id="faq" aria-labelledby="faq-title">
+    <div class="wrap">
+      <h2 class="center-title reveal" id="faq-title">A few questions</h2>
+      <div class="faq-list">
+        <details class="card reveal" open>
+          <summary>Is the data real?<span class="pm" aria-hidden="true"></span></summary>
+          <div class="answer"><p>Both. A simulated store, Fernway Market (240 supplements from 12 brands, 29,040 shoppers, 42,285 reviews), knows the truth, so every method can be scored. A workflow runs the same pipeline on Amazon Reviews 2023: 91,227 supplement reviews.</p></div>
+        </details>
+        <details class="card reveal">
+          <summary>Why train a small model on labels?<span class="pm" aria-hidden="true"></span></summary>
+          <div class="answer"><p>Labelling every review with an LLM is slow and costly. A few hundred LLM labels can train a TF-IDF model that scores the rest; with perfect labels it reaches macro-F1 0.985 from 500.</p></div>
+        </details>
+        <details class="card reveal">
+          <summary>Was the LLM labeller run for these results?<span class="pm" aria-hidden="true"></span></summary>
+          <div class="answer"><p>No: there was no API key, so the labels came from keyword rules. One command, <code>shelfsense label --labeller llm</code>, measures the LLM.</p></div>
+        </details>
+        <details class="card reveal">
+          <summary>How is shopper privacy handled?<span class="pm" aria-hidden="true"></span></summary>
+          <div class="answer"><p>Shopper ids are replaced before anything is stored, the SQL guard never returns them, and saved queries drop groups under 50 shoppers.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta" aria-labelledby="cta-title">
+    <div class="wrap">
+      <div class="cta-panel reveal">
+        <h2 id="cta-title">Want this on your store&#x27;s data?</h2>
+        <p>I can run ShelfSense on your orders and reviews, or build the analytics your insights team needs.</p>
+        <div class="cta-actions">
+          <a class="btn btn-white" href="mailto:faizanreza01@gmail.com?subject=ShelfSense">Email me <svg class="go" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/> <path d="m12 5 7 7-7 7"/></svg></a>
+          <a class="btn btn-line" href="https://github.com/faizanreza-cs/Shelfsense">View on GitHub</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <img src="assets/logo.svg" alt="ShelfSense" width="127" height="32" loading="lazy">
+        <p>Recommendations, review insights and monitoring for a consumer health store, checked against a simulator that knows the truth, then run on real Amazon reviews.</p>
+      </div>
+      <div>
+        <h2 class="label">Project</h2>
+        <ul>
+          <li><a href="https://github.com/faizanreza-cs/Shelfsense">Source on GitHub</a></li>
+          <li><a href="https://github.com/faizanreza-cs/Shelfsense#readme">README</a></li>
+          <li><a href="https://github.com/faizanreza-cs/Shelfsense/blob/main/LICENSE">License (MIT)</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="label">More projects</h2>
+        <ul><li><a href="https://faizanreza-cs.github.io/PDLwatch/">PDLwatch</a></li><li><a href="https://faizanreza-cs.github.io/PharmaPulse/">PharmaPulse</a></li><li><a href="https://faizanreza-cs.github.io/Retail-Media-Lab/">Retail Media Lab</a></li><li><a href="https://faizanreza-cs.github.io/agentkit-enterprise/">AgentKit Enterprise</a></li><li><a href="https://faizanreza-cs.github.io/Docflow-agent/">DocFlow Agent</a></li><li><a href="https://faizanreza-cs.github.io/Ragdesk/">RAGdesk</a></li><li><a href="https://faizanreza-cs.github.io/Pharma-MCP/">Pharma MCP</a></li></ul>
+      </div>
+      <div>
+        <h2 class="label">Contact</h2>
+        <ul>
+          <li><a href="mailto:faizanreza01@gmail.com">Email</a></li>
+          <li><a href="https://www.linkedin.com/in/faizanreza">LinkedIn</a></li>
+          <li><a href="https://x.com/cs_faizan">X</a></li>
+          <li><a href="https://github.com/faizanreza-cs">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-base">
+      <p>© 2026 Faizan Reza</p>
+      <p>Icons: <a href="https://lucide.dev">Lucide</a>. Font: Outfit. <a href="assets/LICENSES.txt">Licenses</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
